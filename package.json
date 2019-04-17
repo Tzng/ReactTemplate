@@ -1,16 +1,13 @@
 {
-  "name": "reacttemplate",
+  "name": "zl-template",
   "version": "1.0.0",
   "description": "模板",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Tzng/ReactTemplate.git"
-  },
-  "author": "",
+  
+  "author": "tzng",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Tzng/ReactTemplate/issues"
