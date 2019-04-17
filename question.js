@@ -26,8 +26,8 @@ const question1 = [
 // rcCom的问题
 const rcQuestion = [            {
     type: 'confirm',
-    name: 'noUseModel',
-    message: '不使用model?',
+    name: 'useModel',
+    message: '是否使用model?',
     default: true // 默认值
 }];
 

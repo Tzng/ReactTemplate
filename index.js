@@ -54,19 +54,19 @@ function readDirFile(name, answers) {
     var files = fs.readdirSync(name);
     // 几个需要对文件进行操作的数据
     let namespace = '';
-    const { noUseModel, author } = answers;
+    const { useModel, author } = answers;
     for (let i = 0; i < files.length; i++) {
         let fileName = `${name}/${files[i]}`;
         // 判断文件是否存在
         if (fs.existsSync(`${name}/${files[i]}`)) {
             // 判断文件是否是models文件
-            if(files[i] === 'model.js' && noUseModel){
+            if(files[i] === 'model.js' && useModel){
                 console.log('删除models文件');
                 // 删除文件
                 fs.unlinkSync(`${name}/${files[i]}`);
                 continue ;
             }
-            if(!noUseModel){
+            if(useModel){
                 namespace = answers.namespace;
             }
             // 如果文件存在的话，就对文件进行操作
@@ -169,7 +169,7 @@ async function reactComponent(params) {
     if (params.type === 'react-component------ES6组件') {
         answer = await inquirer.prompt(rcQuestion);
         // 如果用
-        if(!answer.noUseModel){
+        if(!answer.useModel){
             // 要他输名字
             answer2 = await inquirer.prompt(questions[0]);
         }
