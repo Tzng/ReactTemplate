@@ -15,7 +15,7 @@ const re = new RegExp("^[a-zA-Z]+$"); //检查文件名是否是英文，只支�
 /**
  * 不需要修改名称的文件
  */
-const includes = ['index.ts', 'index.tsx', 'index.js', 'action.js', 'action.tsx', 'action.ts', 'reducer.js', 'reducer.ts', 'reducer.tsx', 'saga.ts', 'saga.js', 'saga.tsx', , 'README.md',]
+const includes = ['index.ts', 'index.tsx', 'index.js', 'action.js', 'action.tsx', 'action.ts', 'reducer.js', 'reducer.ts', 'reducer.tsx', 'saga.ts', 'saga.js', 'saga.tsx', 'README.md',]
 /**
  * 模版对应分支
  */
@@ -55,11 +55,14 @@ program
                     },
                 ])
                 .then(answers => {
-                    console.log(symbols.success, chalk.green('开始创建..........,请稍候'));
+                    console.log(symbols.success, chalk.green('开始创建'+answers.type+'..........,请稍候'));
                     const spinner = ora('正在下载模板...');
                     spinner.start();
-                    const type = getType[answers.type]
-                    download(`github:ReactTemplate/template/#${type}`, name, err => {
+                    const type = getType[answers.type];
+                    // 仓库地址
+                    const url = `github:Tzng/ReactTemplate/#${type}`;
+                    console.log('正在从远程仓库下载文件' + url);
+                    download(url, name, err => {
                         if (err) {
                             spinner.fail();
                         } else {
