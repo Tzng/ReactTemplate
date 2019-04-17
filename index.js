@@ -6,6 +6,7 @@ const download = require('download-git-repo'); //下载模版文件
 const chalk = require('chalk');  //美化终端
 const symbols = require('log-symbols'); //美化终端
 const handlebars = require('handlebars'); //修改模版文件内容
+const { rcQuestion, question1 } = require('./question.js');
 
 const ora = require('ora'); //提示下载
 var inquirer = require('inquirer');  //提示文本
@@ -43,40 +44,92 @@ const getType = {
     "react-redux------typescript ES6组件": "redux-typescript",
 };
 
-program.version(package.version, '-v,--version').command('init <name>').action(name => {
+/**
+ * 读取目标文件夹里面的文件
+ * @param name 目标文件夹
+ * @param answers 用户填写的参数
+ * @return {*}
+ */
+function readDirFile(name, answers) {
+    var files = fs.readdirSync(name);
+    // 几个需要对文件进行操作的数据
+    const { noUseModel, author } = answers;
+    for (let i = 0; i < files.length; i++) {
+        let fileName = `${name}/${files[i]}`;
+        // 判断文件是否存在
+        if (fs.existsSync(`${name}/${files[i]}`)) {
+            // 判断文件是否是models文件
+            if(files[i] === 'models.js' && noUseModel){
+                console.log('删除models文件');
+                // 删除文件
+                fs.unlinkSync(`${name}/${files[i]}`);
+                continue ;
+            }
+            // 如果文件存在的话，就对文件进行操作
+            console.log(symbols.success, chalk.green(`配置文件${name}/${files[i]}完成`));
+            // 读取文件内容
+            const content = fs.readFileSync(fileName).toString();
+            // 替换模板内容
+            const result = handlebars.compile(content)({
+                template: name,
+                descriptions: answers.descriptions,
+                date: new Date().toLocaleString(),
+                author
+            });
+            // 再把文件写进去
+            fs.writeFileSync(fileName, result);
+        }
+    }
+    return files;
+}
+
+/**
+ * 文件夹重命名
+ * @param files
+ * @param name
+ */
+function renFileName(files, name) {
+    let count = 0; //所有文件修改完成，对文件进行改名字
+    for (let i = 0; i < files.length; i++) {
+        if (includes.includes(files[i])) {  //是否需要修改名称
+            continue
+        }
+        //获取文件列表
+        var index = files[i].indexOf('.');
+        fs.rename(
+            `${name}/${files[i]}`,
+            `${name}/${name}${files[i].substring(index)}`,
+            err => {
+                if (err) {
+                    console.log('---错误');
+                }
+                count++;
+                if (count + 1 === files.length) { //排除index.js文件
+                    console.log(symbols.success, chalk.green('模版创建成功'));
+                }
+            }
+        );
+    }
+}
+
+program.version(package.version, '-v,--version').command('init <name>').action(async name => {
     if (!re.test(name)) {
         console.log(symbols.error, chalk.red('组件名称不符合要求，必须以大写字母开头'));
         return
     }
     if (!fs.existsSync(name)) {
-        inquirer.prompt([
-            {
-                type: 'input',
-                message: '请输入文件描述:',
-                name: 'descriptions',
-                default: "没有文件描述" // 默认值
-            },
-            {
-                type: 'list',
-                name: 'type',
-                message: '请选择模版类型?',
-                choices: [
-                    'react-component------ES6组件',
-                    'react-function------函数组件',
-                ],
-            },
-            {
-                type: 'confirm',
-                name: 'useModel',
-                message: '是否使用model?',
-                default: false // 默认值
-            },
-        ]).then(answers => {
-            console.log(symbols.success, chalk.green('开始创建' + name + '..........,请稍候'));
+        try {
+            const answers1 = await inquirer.prompt(question1);
+            // 问题拿去处理
+            const answers2 = await reactComponent(answers1);
+            console.log(JSON.stringify(answers2));
+            // 合并答案
+            const answers = {...answers1, ...answers2};
+            console.log(symbols.success, chalk.green('准备创建' + name + '..........,请稍候'));
             const spinner = ora('正在下载模板...' + JSON.stringify(getType[answers.type]));
             spinner.start();
+
             const type = getType[answers.type];
-            console.log('数据' + JSON.stringify(type));
             // 仓库地址
             const url = `github:Tzng/template/#${type}`;
             console.log('正在从远程仓库github:Tzng/template下载目标分支文件' + type);
@@ -87,49 +140,13 @@ program.version(package.version, '-v,--version').command('init <name>').action(n
                 } else {
                     spinner.succeed();
                     // 读取文件夹里面的文件
-                    var files = fs.readdirSync(name);
-                    for (let i = 0; i < files.length; i++) {
-                        let fileName = `${name}/${files[i]}`;
-                        // 判断文件是否存在
-                        if (fs.existsSync(`${name}/${files[i]}`)) {
-                            // 如果文件存在的话，就对文件进行操作
-                            console.log(symbols.success, chalk.green(`配置文件${name}/${files[i]}完成`));
-                            // 读取文件内容
-                            const content = fs.readFileSync(fileName).toString();
-                            // 替换模板内容
-                            const result = handlebars.compile(content)({
-                                template: name,
-                                descriptions: answers.descriptions
-                            });
-                            // 再把文件写进去
-                            fs.writeFileSync(fileName, result);
-                        }
-
-                    }
-                    let count = 0; //所有文件修改完成，对文件进行改名字
-                    for (let i = 0; i < files.length; i++) {
-                        if (includes.includes(files[i])) {  //是否需要修改名称
-                            continue
-                        }
-                        //获取文件列表
-                        var index = files[i].indexOf('.');
-                        fs.rename(
-                            `${name}/${files[i]}`,
-                            `${name}/${name}${files[i].substring(index)}`,
-                            err => {
-                                if (err) {
-                                    console.log('---错误');
-                                }
-                                count++;
-                                if (count + 1 === files.length) { //排除index.js文件
-                                    console.log(symbols.success, chalk.green('模版创建成功'));
-                                }
-                            }
-                        );
-                    }
+                    var files = readDirFile(name, answers);
+                    renFileName(files, name);
                 }
             });
-        });
+        }catch (e) {
+            console.error('似乎出现了一些问题');
+        }
     } else {
         console.log(symbols.error, chalk.red('有相同名称模版'));
     }
@@ -140,9 +157,10 @@ program.parse(process.argv);
 /**
  * 对普通组件进行处理
  */
-function reactComponent(params) {
+async function reactComponent(params) {
     // 判断是否需要删除model
-    if (params === 'react-component------ES6组件') {
-
+    if (params.type === 'react-component------ES6组件') {
+        return await inquirer.prompt(rcQuestion);
     }
+    return {}
 }
