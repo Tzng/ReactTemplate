@@ -59,7 +59,6 @@ function readDirFile(name, answers) {
         let fileName = `${name}/${files[i]}`;
         // 判断文件是否存在
         if (fs.existsSync(`${name}/${files[i]}`)) {
-            console.log(noUseModel);
             // 判断文件是否是models文件
             if(files[i] === 'model.js' && noUseModel){
                 console.log('删除models文件');
