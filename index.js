@@ -6,7 +6,7 @@ const download = require('download-git-repo'); //下载模版文件
 const chalk = require('chalk');  //美化终端
 const symbols = require('log-symbols'); //美化终端
 const handlebars = require('handlebars'); //修改模版文件内容
-const { rcQuestion, question1 } = require('./question.js');
+const { rcQuestion, question1, questions } = require('./question.js');
 
 const ora = require('ora'); //提示下载
 var inquirer = require('inquirer');  //提示文本
@@ -53,17 +53,22 @@ const getType = {
 function readDirFile(name, answers) {
     var files = fs.readdirSync(name);
     // 几个需要对文件进行操作的数据
+    let namespace = '';
     const { noUseModel, author } = answers;
     for (let i = 0; i < files.length; i++) {
         let fileName = `${name}/${files[i]}`;
         // 判断文件是否存在
         if (fs.existsSync(`${name}/${files[i]}`)) {
+            console.log(noUseModel);
             // 判断文件是否是models文件
-            if(files[i] === 'models.js' && noUseModel){
+            if(files[i] === 'model.js' && noUseModel){
                 console.log('删除models文件');
                 // 删除文件
                 fs.unlinkSync(`${name}/${files[i]}`);
                 continue ;
+            }
+            if(!noUseModel){
+                namespace = answers.namespace;
             }
             // 如果文件存在的话，就对文件进行操作
             console.log(symbols.success, chalk.green(`配置文件${name}/${files[i]}完成`));
@@ -74,7 +79,8 @@ function readDirFile(name, answers) {
                 template: name,
                 descriptions: answers.descriptions,
                 date: new Date().toLocaleString(),
-                author
+                author,
+                namespace
             });
             // 再把文件写进去
             fs.writeFileSync(fileName, result);
@@ -158,9 +164,17 @@ program.parse(process.argv);
  * 对普通组件进行处理
  */
 async function reactComponent(params) {
+    let answer = {};
+    let answer2 = {};
     // 判断是否需要删除model
     if (params.type === 'react-component------ES6组件') {
-        return await inquirer.prompt(rcQuestion);
+        answer = await inquirer.prompt(rcQuestion);
+        // 如果用
+        if(!answer.noUseModel){
+            // 要他输名字
+            answer2 = await inquirer.prompt(questions[0]);
+        }
+        return {...answer,...answer2}
     }
     return {}
 }

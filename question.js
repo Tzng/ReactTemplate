@@ -31,5 +31,14 @@ const rcQuestion = [            {
     default: true // 默认值
 }];
 
+// 其他几个问题
+const questions = [{
+    type: 'input',
+    message: '请输入model的namespace:',
+    name: 'namespace',
+    default: "？？？" // 默认值
+}];
+
 module.exports.question1 = question1;
 module.exports.rcQuestion = rcQuestion;
+module.exports.questions = questions;
