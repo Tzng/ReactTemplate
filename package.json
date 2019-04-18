@@ -11,7 +11,8 @@
     "pub": "npm publish "
   },
   "bin": {
-    "temp-test": "index.js"
+    "temp-test": "index.js",
+    "temp": "index.js"
   },
   "author": "tzng",
   "license": "ISC",
