@@ -4,7 +4,11 @@
   "description": "模板",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "add1": "npm version patch",
+    "add2": "npm version minor",
+    "add3": "npm version major",
+    "pub": "npm publish "
   },
   "bin": {
     "temp": "index.js"
