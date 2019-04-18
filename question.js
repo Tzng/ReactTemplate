@@ -29,17 +29,27 @@ const question1 = [
 ];
 
 // rcCom的问题
-const rcQuestion = [            {
+const rcQuestion = [{
     type: 'confirm',
     name: 'useModel',
-    message: '是否使用model?',
-    default: true // 默认值
+    message: '是否使用model?（默认：不使用）',
+    default: false // 默认值
+},{
+    type: 'confirm',
+    name: 'useMobx',
+    message: '是否使用mobx?（默认：不使用）',
+    default: false // 默认值
 }];
 
 // 其他几个问题
 const questions = [{
     type: 'input',
-    message: '请输入model的namespace:',
+    message: '请输入mobx的namespace:',
+    name: 'namespace',
+    default: "？？？" // 默认值
+},{
+    type: 'input',
+    message: '请输入mobx的namespace:',
     name: 'namespace',
     default: "？？？" // 默认值
 }];
