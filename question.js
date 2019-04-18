@@ -7,10 +7,14 @@ const question1 = [
         default: "没有文件描述" // 默认值
     },
     {
-        type: 'input',
-        message: '请输入作者名称:',
+        type: 'list',
+        message: '选择作者:',
         name: 'author',
-        default: "张三" // 默认值
+        choices: [
+            'allahbin',
+            'hejiaohao',
+            'liukun'
+        ],
     },
     {
         type: 'list',
@@ -19,6 +23,7 @@ const question1 = [
         choices: [
             'react-component------ES6组件',
             'react-function------函数组件',
+            'taro-component-----taro组件'
         ],
     },
 ];

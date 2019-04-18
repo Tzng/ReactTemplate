@@ -18,8 +18,11 @@ const re = new RegExp("^[A-Z].*?$"); //检查文件名是否是英文，只支�
  */
 const includes = [
     'index.ts',
+    'Index.ts',
     'index.tsx',
+    'Index.tsx',
     'index.js',
+    'Index.js',
     'action.js',
     'action.tsx',
     'action.ts',
@@ -30,7 +33,10 @@ const includes = [
     'saga.js',
     'saga.tsx',
     'README.md',
-    'model.js'
+    'model.js',
+    'Index.tsx',
+    'Index.scss',
+    'Index.less',
 ];
 /**
  * 模版对应分支
@@ -42,6 +48,7 @@ const getType = {
     "react-function------typescript 函数组件": "function-typescript",
     "react-component------typescript ES6组件": "component-typescript",
     "react-redux------typescript ES6组件": "redux-typescript",
+    "taro-component-----taro组件": "taro-component"
 };
 
 /**
@@ -97,6 +104,10 @@ function renFileName(files, name) {
     let count = 0; //所有文件修改完成，对文件进行改名字
     for (let i = 0; i < files.length; i++) {
         if (includes.includes(files[i])) {  //是否需要修改名称
+            continue
+        }
+        // 如果是文件夹
+        if(!fs.statSync(`${name}/${files[i]}`).isFile()){
             continue
         }
         //获取文件列表
