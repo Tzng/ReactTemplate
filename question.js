@@ -4,7 +4,13 @@ const question1 = [
         type: 'input',
         message: '请输入文件描述:',
         name: 'descriptions',
-        default: "没有文件描述" // 默认值
+        default: "没有文件描述", // 默认值
+        validate: function(val) {
+            if(val==='没有文件描述') { // 校验位数
+                return "你还能没有文件描述？";
+            }
+            return true
+        }
     },
     {
         type: 'list',

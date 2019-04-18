@@ -43,7 +43,7 @@ const includes = [
  */
 const getType = {
     "react-component------ES6组件": "component",
-    "react-component-model------ES6组件-model": "component",
+    "react-component-model------ES6组件-model": "component-model",
     "react-function------函数组件": "master",
     "react-redux------ES6组件": "redux",
     "react-function------typescript 函数组件": "function-typescript",
@@ -64,8 +64,7 @@ function readDirFile(name, answers) {
     // 处理后的文件数组
     const newFiles = [];
     // 几个需要对文件进行操作的数据
-    let namespace = '';
-    const { useModel, author, useMobx } = answers;
+    const { useModel, author, useMobx, namespace } = answers;
     for (let i = 0; i < files.length; i++) {
         let filePath = `${name}/${files[i]}`;
         // 判断文件是否存在
@@ -128,58 +127,17 @@ function renFileName(files, name) {
     }
 }
 
-/**
- * 判断是否要删除文件
- * @param name 要创建的组件名称
- * @param type 用户的参数
- * @param path 文件的地址
- * @param fileName 文件的名称
- * @param useModel 是否使用model
- * @return true false
- */
-async function unlinkFile(name, type, path, fileName, useModel){
-    switch (params.type) {
-        case 'react-component------ES6组件':
-            return rcCom(path, fileName, useModel);
-        case 'taro-component-----taro组件':
-            return taroCom(name, path, fileName, useModel);
-        default:
-            return false
-    }
-}
-
-async function taroCom(name, path, fileName, useModel){
+function buildUrl(params, type){
+    console.log(JSON.stringify(params));
+    const { useMobx, useModel } = params;
+    let url = `github:Tzng/template/#${type}`;
     if(useModel){
-        // 先删除的index.js文件
-        if(fileName === 'index.tsx'){
-            // 删除
-            fs.unlinkSync(path);
-            return false
-        }else if(fileName === 'Index.mobx.tsx'){
-            // 改名
-            fs.renameSync(`${name}/Index.mobx.tsx`, `${name}/Index.tsx`);
-            return true
-        }
+        return url + '-model'
     }
-    return false
-}
-
-/**
- * rc组件的触发
- * @param path
- * @param fileName
- * @param useModel
- * @return {Promise<boolean>}
- */
-async function rcCom(path, fileName, useModel){
-    // 判断文件是否是models文件
-    if(fileName === 'model.js' && useModel){
-        console.log('删除models文件');
-        // 删除文件
-        fs.unlinkSync(path);
-        return true
+    if(useMobx){
+        return url + '-mobx'
     }
-    return false
+    return url;
 }
 
 program.version(package.version, '-v,--version').command('init <name>').action(async name => {
@@ -200,9 +158,9 @@ program.version(package.version, '-v,--version').command('init <name>').action(a
             spinner.start();
 
             const type = getType[answers.type];
-            // 仓库地址
-            const url = `github:Tzng/template/#${type}`;
-            console.log('正在从远程仓库github:Tzng/template下载目标分支文件' + type);
+            // 根据条件获取urld
+            const url = buildUrl(answers, type);
+            console.log('正在从远程仓库github:Tzng/template下载目标分支文件' + url);
             // 下载仓库的代码，第一个是地址，第二个是要保存的地也就是前面输入的名称
             download(url, name, err => {
                 if (err) {
