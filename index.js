@@ -74,7 +74,7 @@ function readDirFile(name, answers) {
                 continue
             }
             // 如果文件存在的话，就对文件进行操作
-            console.log(symbols.success, chalk.green(`配置文件${filePath}完成`));
+            console.log(symbols.success, chalk.green(`准备配置文件${filePath}`));
             // 读取文件内容
             const content = fs.readFileSync(filePath).toString();
             // 替换模板内容
@@ -82,9 +82,10 @@ function readDirFile(name, answers) {
                 template: name,
                 descriptions: answers.descriptions,
                 date: new Date().toLocaleString(),
-                author,
-                namespace
+                author: author,
+                namespace: namespace
             });
+            console.log('再把文件写进去' + filePath);
             // 再把文件写进去
             fs.writeFileSync(filePath, result);
             newFiles.push(files[i]);
@@ -167,6 +168,7 @@ program.version(package.version, '-v,--version').command('init <name>').action(a
                     spinner.fail();
                 } else {
                     spinner.succeed();
+                    console.log(symbols.success, chalk.green('文件下载成功，准备配置...'));
                     // 读取文件夹里面的文件
                     var files = readDirFile(name, answers);
                     renFileName(files, name);
